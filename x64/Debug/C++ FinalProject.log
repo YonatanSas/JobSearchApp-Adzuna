@@ -1,0 +1,12 @@
+﻿  FavoritesManager.cpp
+  imgui_impl_glfw.cpp
+  imgui_impl_opengl3.cpp
+  imgui.cpp
+  imgui_draw.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  JobSearch.cpp
+  main.cpp
+  UserInterface.cpp
+  Generating Code...
+  C++ FinalProject.vcxproj -> C:\Users\Jonat\source\repos\C++ FinalProject\x64\Debug\C++ FinalProject.exe
