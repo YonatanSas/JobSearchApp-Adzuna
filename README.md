@@ -5,7 +5,7 @@ This application is a comprehensive job search tool that leverages the Adzuna AP
 It features a graphical user interface built with ImGui, allowing users to search for jobs, view details, and manage favorites.
 
 ## Preview:
-https://github.com/user-attachments/assets/f27dfce3-d421-41d9-ab1b-8e4a4ec4da5d
+https://github.com/user-attachments/assets/be5bbd16-bdc1-46bf-8e0f-e9069076370c
 
 ## Features
 - **Job Search**: Search for jobs by title, location, and salary range.
