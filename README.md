@@ -50,7 +50,7 @@ https://github.com/user-attachments/assets/be5bbd16-bdc1-46bf-8e0f-e9069076370c
 5. Navigate to the extracted folder and select the `C++ FinalProject.sln` file.
 6. Once the project is loaded, ensure that the solution configuration is set to "Debug" and the solution platform is set to "x64" (you can check this in the toolbar).
 7. Click on "Build" > "Build Solution" to compile the project.
-8. After successful compilation, click on "Debug" > "Start Debugging" or press F5 to run the application.
+8. After successful compilation, click on "run" or press F5 to run the application.
 
 ## Usage
 1. Upon launching the application, you'll see the main interface.
