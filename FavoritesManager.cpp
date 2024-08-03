@@ -8,7 +8,7 @@
 // Includes the JSON library for parsing and creating JSON data
 
 FavoritesManager::FavoritesManager() {}
-// Constructor implementation (empty in this case)
+// Constructor implementation
 
 void FavoritesManager::saveFavorites(const std::vector<Job>& favorites) {
     // Function to save favorite jobs to a JSON file
