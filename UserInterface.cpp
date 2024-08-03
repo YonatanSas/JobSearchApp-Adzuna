@@ -379,10 +379,6 @@ void UserInterface::render() {
     // End the main ImGui window
 }
 
-void UserInterface::handleInput() {
-    // This method is currently empty, but you can add any additional input handling here if needed
-}
-
 bool UserInterface::containsIgnoreCase(const std::string& str, const std::string& substr) {
     // Function to check if a string contains a substring, ignoring case
     auto it = std::search(
