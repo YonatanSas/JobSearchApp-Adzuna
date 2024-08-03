@@ -25,9 +25,6 @@ public:
     void render();
     // Function to render the user interface
 
-    void handleInput();
-    // Function to handle user input
-
 private:
     struct CountryInfo {
         std::string name;
