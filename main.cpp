@@ -60,6 +60,7 @@ int main() {
     if (mainFont == nullptr) {
         // Handle font loading failure
         std::cerr << "Failed to load font!" << std::endl;
+        return 1;
     }
 
     // Build the font atlas
