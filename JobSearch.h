@@ -53,6 +53,7 @@ public:
     bool getSearchRequested();
 
     void updateApiCredentials(std::string& app_id, std::string& app_key, const std::string& configPath);
+//Function for loading the app_id and app_key from the config.ini file to the variables.
 
 
 private:
