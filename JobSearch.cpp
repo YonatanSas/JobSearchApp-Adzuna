@@ -187,7 +187,7 @@ void JobSearch::performSearch() {
             // Log the number of jobs found
     }
     else {
-        std::cerr << "API request failed. Status: " << (res ? std::to_string(res->status) : "No response") << std::endl;
+        std::cerr << "API request failed.\n Check if you have the right api_key and app_id (You can find on the README file.\n Status: " << (res ? std::to_string(res->status) : "No response") << std::endl;
         if (res) {
             std::cerr << "Response body: " << res->body << std::endl;
         }
