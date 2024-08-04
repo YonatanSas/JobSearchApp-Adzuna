@@ -27,30 +27,30 @@ void JobSearch::searchJobs(const std::string& query, const std::string& country,
     const std::string& salaryRange,
     int resultsPerPage, const std::string& currencySymbol) {
     // Function to initiate a job search with the given parameters
+        {
+            std::lock_guard<std::mutex> lock(searchMutex);
+            // Lock the mutex to ensure thread-safe access to shared data
 
-    std::unique_lock<std::mutex> lock(resultsMutex);
-    // Lock the mutex to ensure thread-safe access to shared data
+            results.clear();  // Clear previous results
+            // Clear the previous search results
 
-    results.clear();  // Clear previous results
-    // Clear the previous search results
+            currentQuery = query;
+            currentCountry = country;
+            currentSalaryRange = salaryRange;
+            currentResultsPerPage = resultsPerPage;
+            currentCurrencySymbol = currencySymbol;
+            // Store the search parameters
 
-    currentQuery = query;
-    currentCountry = country;
-    currentSalaryRange = salaryRange;
-    currentResultsPerPage = resultsPerPage;
-    currentCurrencySymbol = currencySymbol;
-    // Store the search parameters
-
-    searchRequested = true;
-    // Set the flag to indicate a search has been requested
-
+            searchRequested = true;
+            // Set the flag to indicate a search has been requested
+        }
     cv.notify_one();
     // Notify the search thread that a new search has been requested
 }
 
 std::vector<Job> JobSearch::getResults() const {
     // Function to retrieve the current search results
-    std::lock_guard<std::mutex> lock(resultsMutex);
+    std::lock_guard<std::mutex> lock(searchMutex);
     // Lock the mutex to ensure thread-safe access to the results
 
     return results;
@@ -66,7 +66,7 @@ void JobSearch::startSearchThread() {
 void JobSearch::stopSearchThread() {
     // Function to stop the search thread
     {
-        std::unique_lock<std::mutex> lock(resultsMutex);
+        std::lock_guard<std::mutex> lock(searchMutex);
         // Lock the mutex
 
         stopThread = true;
@@ -85,7 +85,7 @@ void JobSearch::searchThreadFunction() {
     // The main function that runs in the search thread
     while (!stopThread) {
         // Continue running until stopThread is set to true
-        std::unique_lock<std::mutex> lock(resultsMutex);
+        std::unique_lock<std::mutex> lock(searchMutex);
         // Lock the mutex
 
         cv.wait(lock, [this] { return searchRequested || stopThread; });
@@ -102,6 +102,8 @@ void JobSearch::searchThreadFunction() {
             performSearch();
             // Perform the actual search
 
+            lock.lock();
+            // Lock the mutex before Reset the search request flag
             searchRequested = false;
             // Reset the search request flag
         }
@@ -109,6 +111,8 @@ void JobSearch::searchThreadFunction() {
 }
 
 bool JobSearch::getSearchRequested() {
+    std::lock_guard<std::mutex> lock(searchMutex);
+    // Lock the mutex
     return searchRequested;
 }
 
@@ -191,7 +195,7 @@ void JobSearch::performSearch() {
     }
 
     {
-        std::lock_guard<std::mutex> lock(resultsMutex);
+        std::lock_guard<std::mutex> lock(searchMutex);
         results = std::move(newResults);
         // Update the results vector with the new search results
         // Use std::move for efficiency, transferring ownership of newResults to results
