@@ -53,6 +53,19 @@ https://github.com/user-attachments/assets/be5bbd16-bdc1-46bf-8e0f-e9069076370c
 8. After successful compilation, click on "run" or press F5 to run the application.
 
 ## Usage
+### Setting up API Credentials
+Before running the application, you need to set up your API credentials:
+1. Go to https://developer.adzuna.com/signup
+2. Sign up to receive your `app_id` and `api_key`
+3. Open the `config.ini` file located in the project directory
+4. Insert your credentials in the appropriate places in the file:
+
+   ```ini
+   [API]
+   api_id=YOUR_APP_ID_HERE
+   api_key=YOUR_API_KEY_HERE
+   
+### Main Launch
 1. Upon launching the application, you'll see the main interface.
 2. Enter a job title in the search box.
 3. Select a country from the dropdown menu.
