@@ -50,6 +50,11 @@ public:
     void stopSearchThread();
     // Function to stop the search thread
 
+    bool getSearchRequested();
+
+    void updateApiCredentials(std::string& app_id, std::string& app_key, const std::string& configPath);
+
+
 private:
     std::vector<Job> results;
     // Vector to store the search results
@@ -86,6 +91,10 @@ private:
 
     std::string currentCurrencySymbol;
     // Current currency symbol for the search
+
+    std::string app_id;
+
+    std::string api_key;
 
     void searchThreadFunction();
     // Function that runs in the search thread
