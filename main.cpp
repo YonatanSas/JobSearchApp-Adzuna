@@ -50,13 +50,8 @@ int main() {
         0,
     };
 
-    // Configure font loading
-    ImFontConfig config;
-    config.MergeMode = false; // We're loading everything at once, so no merge
-    config.PixelSnapH = true; // Improves text sharpness
-
     // Load the font with all required characters
-    ImFont* mainFont = io.Fonts->AddFontFromFileTTF("calibri.ttf", 20.0f, &config, ranges);
+    ImFont* mainFont = io.Fonts->AddFontFromFileTTF("calibri.ttf", 20.0f, NULL, ranges);
     if (mainFont == nullptr) {
         // Handle font loading failure
         std::cerr << "Failed to load font!" << std::endl;
@@ -74,18 +69,18 @@ int main() {
     // Get the ImGui style object to customize colors
 
     // Set various style colors
-    style.Colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);  // öáò è÷ñè
-    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.9961f, 0.9529f, 0.8863f, 1.0f);//öáò çìåï øàùé
-    style.Colors[ImGuiCol_PopupBg] = ImVec4(0.9961f, 0.9529f, 0.8863f, 1.0f);  // öáò ø÷ò çìåï ÷åôõ
-    style.Colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);  // öáò âáåì
-    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.7451f, 0.7765f, 0.6275f, 1.0f); // öáò ø÷ò îñâøú
-    style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.3765f, 0.4000f, 0.4627f, 1.0f);  // öáò ø÷ò îñâøú áîòáø òëáø
-    style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.67f, 0.67f, 0.67f, 0.39f);  // öáò ø÷ò îñâøú ôòéìä
-    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);  // öáò ø÷ò ëåúøú
-    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.9961f, 0.9529f, 0.8863f, 1.0f);  // öáò ø÷ò ëåúøú ôòéìä
-    style.Colors[ImGuiCol_Button] = ImVec4(0.78f, 0.78f, 0.78f, 0.67f);  // öáò ëôúåø
-    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.3765f, 0.4000f, 0.4627f, 1.0f);   // öáò ëôúåø áîòáø òëáø
-    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.3765f, 0.4000f, 0.4627f, 1.0f);// öáò ëôúåø ôòéì
+    style.Colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);  // text
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.9961f, 0.9529f, 0.8863f, 1.0f);// main window
+    style.Colors[ImGuiCol_PopupBg] = ImVec4(0.9961f, 0.9529f, 0.8863f, 1.0f);  // popup window
+    style.Colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);  // border
+    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.7451f, 0.7765f, 0.6275f, 1.0f); // frame background
+    style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.3765f, 0.4000f, 0.4627f, 1.0f);  // frame background hovered
+    style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.67f, 0.67f, 0.67f, 0.39f);  // frame background click
+    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);  // title background
+    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.9961f, 0.9529f, 0.8863f, 1.0f);  // title background atcive
+    style.Colors[ImGuiCol_Button] = ImVec4(0.78f, 0.78f, 0.78f, 0.67f);  // button
+    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.3765f, 0.4000f, 0.4627f, 1.0f);   // button hovered
+    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.3765f, 0.4000f, 0.4627f, 1.0f);// button click
 
 
 
