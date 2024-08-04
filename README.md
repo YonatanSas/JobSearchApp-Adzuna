@@ -45,26 +45,26 @@ https://github.com/user-attachments/assets/be5bbd16-bdc1-46bf-8e0f-e9069076370c
 ### Installation Steps
 1. Download the project as a ZIP file from GitHub.
 2. Extract the ZIP file to your desired location.
-Setting up API Credentials:
-Before running the application, you need to set up your API credentials:
-a. Go to https://developer.adzuna.com/signup
-b. Sign up to receive your `app_id` and `api_key`
-c. Open the `config.ini` file located in the project directory
-d. Insert your credentials in the appropriate places in the file:
-
-   ```ini
-   [API]
-   api_id=YOUR_APP_ID_HERE
-   api_key=YOUR_API_KEY_HERE
+3. Setting up API Credentials:
+  - Before running the application, you need to set up your API credentials:
+    - Go to https://developer.adzuna.com/signup
+    - Sign up to receive your `app_id` and `api_key`
+    - Open the `config.ini` file located in the project directory
+    - Insert your credentials in the appropriate places in the file and save it:
+  
+     ```ini
+     [API]
+     api_id=YOUR_APP_ID_HERE
+     api_key=YOUR_API_KEY_HERE
 
 After all that:
    
-3. Open Visual Studio.
-4. Click on "File" > "Open" > "Project/Solution".
-5. Navigate to the extracted folder and select the `C++ FinalProject.sln` file.
-6. Once the project is loaded, ensure that the solution configuration is set to "Debug" and the solution platform is set to "x64" (you can check this in the toolbar).
-7. Click on "Build" > "Build Solution" to compile the project.
-8. After successful compilation, click on "run" or press F5 to run the application.
+4. Open Visual Studio.
+5. Click on "File" > "Open" > "Project/Solution".
+6. Navigate to the extracted folder and select the `C++ FinalProject.sln` file.
+7. Once the project is loaded, ensure that the solution configuration is set to "Debug" and the solution platform is set to "x64" (you can check this in the toolbar).
+8. Click on "Build" > "Build Solution" to compile the project.
+9. After successful compilation, click on "run" or press F5 to run the application.
 
 ## Usage
 1. Upon launching the application, you'll see the main interface.
