@@ -202,6 +202,8 @@ void JobSearch::performSearch() {
     }
 }
 
+//Function for loading the app_id and app_key from the config.ini file to the variables.
+
 void JobSearch::updateApiCredentials(std::string& app_id, std::string& app_key, const std::string& configPath) {
     std::ifstream configFile(configPath);
     if (!configFile.is_open()) {
