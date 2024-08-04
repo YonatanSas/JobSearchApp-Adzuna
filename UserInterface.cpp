@@ -1,11 +1,8 @@
-﻿#include "UserInterface.h"
+#include "UserInterface.h"
 // Includes the header file for the UserInterface class, providing access to its declarations
 
 #include <imgui.h>
 // Includes the Dear ImGui library, which is used for creating the graphical user interface
-
-#include <cstring>
-// Includes the C-style string handling functions
 
 #include <algorithm>
 // Includes the C++ Standard Template Library algorithms
@@ -21,9 +18,6 @@
 
 #include <sstream>
 // Includes the string stream class for string manipulation
-
-#include <limits>
-// Includes numeric limits, used for handling minimum and maximum values of data types
 
 UserInterface::UserInterface() : showFavorites(false), selectedJob(-1), isSearching(false) {
     // Constructor for the UserInterface class
@@ -54,7 +48,7 @@ UserInterface::UserInterface() : showFavorites(false), selectedJob(-1), isSearch
     // Initializes the countries vector with country information
     // Each entry contains the country name, country code, and currency symbol
 
-    loadFavorites();
+    favorites = favoritesManager.loadFavorites();
     // Calls the loadFavorites function to load any previously saved favorite jobs
 }
 
@@ -74,35 +68,19 @@ void UserInterface::toggleFavorite(const Job& job) {
         // If the job is not in favorites, add it
     }
 
-    saveFavorites();
-    // Save the updated favorites list
-}
-
-void UserInterface::loadFavorites() {
-    // Function to load favorite jobs from storage
-    favorites = favoritesManager.loadFavorites();
-    // Calls the loadFavorites function of the favoritesManager object
-    // This loads the saved favorites and assigns them to the favorites vector
-}
-
-void UserInterface::saveFavorites() {
-    // Function to save favorite jobs to storage
     favoritesManager.saveFavorites(favorites);
-    // Calls the saveFavorites function of the favoritesManager object
-    // This saves the current favorites vector to persistent storage
+    // Save the updated favorites list
 }
 
 std::string formatSalary(double salary, const std::string& currency) {
     // Function to format a salary with thousands separators and currency symbol
-    std::stringstream ss;
-    ss << std::fixed << std::setprecision(0) << std::round(salary);
-    std::string strSalary = ss.str();
-    // Converts the salary to a string with no decimal places
 
-    int length = static_cast<int>(strSalary.length());
+    std::string strSalary = std::to_string((int)(salary));
+
+    int length = (int)strSalary.length();
     int insertPosition = length - 3;
     while (insertPosition > 0) {
-        strSalary.insert(static_cast<size_t>(insertPosition), ",");
+        strSalary.insert(insertPosition, ",");
         insertPosition -= 3;
     }
     // Inserts thousands separators (commas) into the salary string
@@ -111,53 +89,10 @@ std::string formatSalary(double salary, const std::string& currency) {
     // Returns the formatted salary string with the currency symbol appended
 }
 
-bool shouldDisplayJob(const Job& job, const std::string& salaryRange) {
-    // Function to determine if a job should be displayed based on the selected salary range
-    double minSalary = 0.0, maxSalary = (std::numeric_limits<double>::max)();
-    // Initialize minimum and maximum salaries
-    // The maximum is set to the highest possible double value
-
-    if (salaryRange == "100000+") {
-        minSalary = 100000.0;
-        // If the range is "100000+", set the minimum salary to 100000
-    }
-    else {
-        size_t dashPos = salaryRange.find('-');
-        if (dashPos != std::string::npos) {
-            minSalary = std::stod(salaryRange.substr(0, dashPos));
-            maxSalary = std::stod(salaryRange.substr(dashPos + 1));
-            // If the range contains a dash, parse the min and max salaries
-        }
-    }
-
-    return job.salary >= minSalary && job.salary <= maxSalary;
-    // Return true if the job's salary is within the specified range
-}
-
-void UserInterface::updateSearchResults() {
-    // Function to update the search results
-    if (isSearching) {
-        // If a search is in progress
-        auto now = std::chrono::steady_clock::now();
-        // Get the current time
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSearchTime).count() >= 1) {
-            // If at least 1 second has passed since the last update
-            currentSearchResults = jobSearch.getResults();
-            // Get the latest results from the jobSearch object
-            if (!currentSearchResults.empty()) {
-                isSearching = false;
-                // If results are received, set isSearching to false
-            }
-            lastSearchTime = now;
-            // Update the last search time
-        }
-    }
-}
-
 void UserInterface::render() {
     // Function to render the user interface
-    updateSearchResults();
-    // Update search results before rendering
+
+    isSearching = jobSearch.getSearchRequested();
 
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
@@ -170,16 +105,33 @@ void UserInterface::render() {
     static int salaryIndex = 0;
     // Define an array of salary ranges and an index to keep track of the selected range
 
+    // Render error popups
+    if (ImGui::BeginPopupModal("Country Error", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Please select a country before searching.");
+        if (ImGui::Button("OK")) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopupModal("Search Error", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Please enter a job title to search.");
+        if (ImGui::Button("OK")) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
     if (!showFavorites) {
         // If not showing favorites (i.e., in search mode)
         static char searchBuffer[256] = "";
-        ImGui::InputText("Job Title", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+        ImGui::InputText("Job Title", searchBuffer, 256);
         // Create an input text field for the job title search
 
         static int countryIndex = 0;
         if (ImGui::BeginCombo("Country", countries[countryIndex].name.c_str())) {
             // Begin a combo box (dropdown) for country selection
-            for (int i = 0; i < static_cast<int>(countries.size()); i++) {
+            for (int i = 0; i < countries.size(); i++) {
                 const bool isSelected = (countryIndex == i);
                 if (ImGui::Selectable(countries[i].name.c_str(), isSelected)) {
                     countryIndex = i;
@@ -206,10 +158,7 @@ void UserInterface::render() {
                 std::string salaryRange = salaryRanges[salaryIndex];
                 jobSearch.searchJobs(searchBuffer, countries[countryIndex].code, salaryRange, resultsPerPage, countries[countryIndex].currencySymbol);
                 // Initiate a job search with the specified parameters
-                isSearching = true;
-                lastSearchTime = std::chrono::steady_clock::now();
                 selectedJob = -1;  // Reset selected job
-                currentSearchResults.clear();  // Clear previous results
             }
             else {
                 // If search criteria are invalid, show error popups
@@ -223,38 +172,57 @@ void UserInterface::render() {
         }
 
         ImGui::SameLine();
-    }
 
-    if (ImGui::Button(showFavorites ? "Back to Search" : "Favorites")) {
-        showFavorites = !showFavorites;
-        selectedJob = -1;  // Reset selected job
-    }
-    // Create a button to toggle between search results and favorites
-
-    // Render error popups
-    if (ImGui::BeginPopupModal("Country Error", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("Please select a country before searching.");
-        if (ImGui::Button("OK")) {
-            ImGui::CloseCurrentPopup();
+        if (ImGui::Button("Favorites")) {
+            showFavorites = !showFavorites;
+            selectedJob = -1;  // Reset selected job
         }
-        ImGui::EndPopup();
-    }
 
-    if (ImGui::BeginPopupModal("Search Error", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("Please enter a job title to search.");
-        if (ImGui::Button("OK")) {
-            ImGui::CloseCurrentPopup();
+        ImGui::Separator();
+        // Add a separator line
+
+        ImGui::Columns(2, "JobColumns", true);
+
+        // Create two columns for the layout
+        if (isSearching) {
+            ImGui::Text("Searching...");
         }
-        ImGui::EndPopup();
+        else {
+            currentSearchResults = jobSearch.getResults();
+            isSearching = false;
+            ImGui::Text("Displaying %d jobs", currentSearchResults.size());
+        }
+
+        ImGui::BeginChild("JobList", ImVec2(0, 0), true);
+        for (int i = 0; i < currentSearchResults.size(); i++) {
+            const auto& job = currentSearchResults[i];
+            bool isFavorite = std::find_if(favorites.begin(), favorites.end(),
+                [&job](const Job& fav) { return fav.url == job.url; }) != favorites.end();
+            if (ImGui::Checkbox(("##" + std::to_string(i)).c_str(), &isFavorite)) {
+                toggleFavorite(job);
+            }
+            ImGui::SameLine();
+            if (ImGui::Selectable((job.title + "##" + std::to_string(i)).c_str(), selectedJob == i)) {
+                selectedJob = i;
+            }
+        }
+        // Render the list of search results, allowing toggling of favorites and selection of jobs
+        ImGui::EndChild();
     }
 
-    ImGui::Separator();
-    // Add a separator line
+    else {
+        // favorites mode
+        if (ImGui::Button("Back to Search")) {
+            showFavorites = !showFavorites;
+            selectedJob = -1;  // Reset selected job
+        }
 
-    ImGui::Columns(2, "JobColumns", true);
-    // Create two columns for the layout
+        ImGui::Separator();
+        // Add a separator line
 
-    if (showFavorites) {
+        ImGui::Columns(2, "JobColumns", true);
+        // Create two columns for the layout
+
         // If showing favorites
         ImGui::Text("Favorites");
 
@@ -266,27 +234,27 @@ void UserInterface::render() {
 
         if (ImGui::Button("Delete Selected")) {
             // If the Delete Selected button is clicked
-            for (int i = static_cast<int>(favorites.size()) - 1; i >= 0; --i) {
+            for (int i = (int)favorites.size() - 1; i >= 0; --i) {
                 if (selectedFavorites[i]) {
                     favorites.erase(favorites.begin() + i);
                     selectedFavorites.erase(selectedFavorites.begin() + i);
                 }
             }
             // Remove selected favorites
-            saveFavorites();
+            favoritesManager.saveFavorites(favorites);
             // Save the updated favorites list
-            if (selectedJob >= static_cast<int>(favorites.size())) {
+            if (selectedJob >= favorites.size()) {
                 selectedJob = -1;
             }
             // Reset selected job if it's no longer valid
         }
 
         ImGui::BeginChild("FavoritesList", ImVec2(0, 0), true);
-        for (int i = 0; i < static_cast<int>(favorites.size()); i++) {
+        for (int i = 0; i < favorites.size(); i++) {
             const auto& job = favorites[i];
-            bool isSelected = selectedFavorites[i] != 0;
+            bool isSelected = selectedFavorites[i];
             if (ImGui::Checkbox(("##fav" + std::to_string(i)).c_str(), &isSelected)) {
-                selectedFavorites[i] = isSelected ? 1 : 0;
+                selectedFavorites[i] = isSelected;
             }
             ImGui::SameLine();
             if (ImGui::Selectable((job.title + "##fav" + std::to_string(i)).c_str(), selectedJob == i)) {
@@ -294,35 +262,6 @@ void UserInterface::render() {
             }
         }
         // Render the list of favorite jobs with checkboxes and make them selectable
-        ImGui::EndChild();
-    }
-    else {
-        // If showing search results
-        updateSearchResults();
-
-        if (isSearching) {
-            ImGui::Text("Searching...");
-        }
-        else {
-            ImGui::Text("Displaying %d jobs", static_cast<int>(currentSearchResults.size()));
-        }
-
-        ImGui::BeginChild("JobList", ImVec2(0, 0), true);
-        for (int i = 0; i < static_cast<int>(currentSearchResults.size()); i++) {
-            const auto& job = currentSearchResults[i];
-            if (shouldDisplayJob(job, salaryRanges[salaryIndex])) {
-                bool isFavorite = std::find_if(favorites.begin(), favorites.end(),
-                    [&job](const Job& fav) { return fav.url == job.url; }) != favorites.end();
-                if (ImGui::Checkbox(("##" + std::to_string(i)).c_str(), &isFavorite)) {
-                    toggleFavorite(job);
-                }
-                ImGui::SameLine();
-                if (ImGui::Selectable((job.title + "##" + std::to_string(i)).c_str(), selectedJob == i)) {
-                    selectedJob = i;
-                }
-            }
-        }
-        // Render the list of search results, allowing toggling of favorites and selection of jobs
         ImGui::EndChild();
     }
 
@@ -333,10 +272,10 @@ void UserInterface::render() {
     ImGui::BeginChild("JobDetails", ImVec2(0, 0), true);
 
     const Job* selectedJobPtr = nullptr;
-    if (showFavorites && selectedJob >= 0 && selectedJob < static_cast<int>(favorites.size())) {
+    if (showFavorites && selectedJob >= 0 && selectedJob < favorites.size()) {
         selectedJobPtr = &favorites[selectedJob];
     }
-    else if (!showFavorites && selectedJob >= 0 && selectedJob < static_cast<int>(currentSearchResults.size())) {
+    else if (!showFavorites && selectedJob >= 0 && selectedJob < currentSearchResults.size()) {
         selectedJobPtr = &currentSearchResults[selectedJob];
     }
     // Determine which job is currently selected
@@ -372,21 +311,6 @@ void UserInterface::render() {
     ImGui::EndChild();
     // End the child window for job details
 
-    ImGui::Columns(1);
-    // Reset the column layout to a single column
-
     ImGui::End();
     // End the main ImGui window
-}
-
-bool UserInterface::containsIgnoreCase(const std::string& str, const std::string& substr) {
-    // Function to check if a string contains a substring, ignoring case
-    auto it = std::search(
-        str.begin(), str.end(),
-        substr.begin(), substr.end(),
-        [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }
-    );
-    // Use the std::search algorithm with a lambda function to perform case-insensitive comparison
-    return (it != str.end());
-    // Return true if the substring is found, false otherwise
 }
