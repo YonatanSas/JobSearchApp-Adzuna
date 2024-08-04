@@ -4,15 +4,15 @@
 #include "JobSearch.h"
 // Include the header file for the JobSearch class
 
-#include <iostream>
-// Include the input/output stream library for console output
-
 #include <sstream>
 // Include the string stream library for string manipulation
 
 JobSearch::JobSearch() : stopThread(false), searchRequested(false) {
     // Constructor for the JobSearch class
     // Initialize stopThread and searchRequested to false
+
+    updateApiCredentials(app_id, api_key, "config.ini");
+
     startSearchThread();
     // Start the search thread when the object is created
 }
@@ -71,10 +71,10 @@ void JobSearch::stopSearchThread() {
 
         stopThread = true;
         // Set the flag to stop the thread
-
-        cv.notify_one();
-        // Notify the search thread to check its stop condition
     }
+
+    cv.notify_one();
+    // Notify the search thread to check its stop condition
     if (searchThread.joinable()) {
         searchThread.join();
         // Wait for the search thread to finish if it's joinable
@@ -95,23 +95,25 @@ void JobSearch::searchThreadFunction() {
         // If stop is requested, exit the loop
 
         if (searchRequested) {
-            searchRequested = false;
-            // Reset the search request flag
 
             lock.unlock();
             // Unlock the mutex before performing the search
 
             performSearch();
             // Perform the actual search
+
+            searchRequested = false;
+            // Reset the search request flag
         }
     }
 }
 
+bool JobSearch::getSearchRequested() {
+    return searchRequested;
+}
+
 void JobSearch::performSearch() {
     // Function to perform the actual job search
-    std::string app_id = "f4ad5bfa";
-    std::string api_key = "68798b983c31ae07f66077c6017844ca";
-    // API credentials for Adzuna
 
     std::string encodedQuery = httplib::detail::encode_url(currentQuery);
     // URL-encode the search query
@@ -156,7 +158,6 @@ void JobSearch::performSearch() {
 
     if (res && res->status == 200) {
         // If the request was successful (HTTP status 200)
-        try {
             auto json = nlohmann::json::parse(res->body);
             // Parse the JSON response
 
@@ -180,12 +181,6 @@ void JobSearch::performSearch() {
 
             std::cout << "Found " << newResults.size() << " jobs." << std::endl;
             // Log the number of jobs found
-        }
-        catch (const std::exception& e) {
-            std::cerr << "Error parsing JSON: " << e.what() << std::endl;
-            std::cerr << "Response body: " << res->body << std::endl;
-            // Log any errors that occur during JSON parsing
-        }
     }
     else {
         std::cerr << "API request failed. Status: " << (res ? std::to_string(res->status) : "No response") << std::endl;
@@ -200,5 +195,32 @@ void JobSearch::performSearch() {
         results = std::move(newResults);
         // Update the results vector with the new search results
         // Use std::move for efficiency, transferring ownership of newResults to results
+    }
+}
+
+void JobSearch::updateApiCredentials(std::string& app_id, std::string& app_key, const std::string& configPath) {
+    std::ifstream configFile(configPath);
+    if (!configFile.is_open()) {
+        throw std::runtime_error("Unable to open config file: " + configPath);
+    }
+
+    std::string line;
+    bool foundId = false, foundKey = false;
+
+    while (std::getline(configFile, line)) {
+        if (line.find("app_id=") != std::string::npos) {
+            app_id = line.substr(line.find("=") + 1);
+            foundId = true;
+        }
+        else if (line.find("api_key=") != std::string::npos) {
+            app_key = line.substr(line.find("=") + 1);
+            foundKey = true;
+        }
+
+        if (foundId && foundKey) break;
+    }
+
+    if (!foundId || !foundKey) {
+        throw std::runtime_error("API credentials not found in config file");
     }
 }
