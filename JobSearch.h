@@ -62,8 +62,8 @@ private:
     std::thread searchThread;
     // Thread object for performing searches asynchronously
 
-    mutable std::mutex resultsMutex;
-    // Mutex for thread-safe access to the results vector
+    mutable std::mutex searchMutex;
+    // Mutex for thread-safe access to the shared varibales
 
     std::atomic<bool> stopThread;
     // Atomic flag to signal the search thread to stop
