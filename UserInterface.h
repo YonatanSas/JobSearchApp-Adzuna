@@ -1,20 +1,13 @@
 #pragma once
 // Prevents multiple inclusions of this header file
-
 #include "JobSearch.h"
-// Includes the JobSearch header file, which likely contains the JobSearch class definition
-
+// Includes the JobSearch header file - contains the JobSearch class definition
 #include "FavoritesManager.h"
-// Includes the FavoritesManager header file, which likely contains the FavoritesManager class definition
-
+// Includes the FavoritesManager header file - contains the FavoritesManager class definition
 #include <vector>
-// Includes the vector container from the C++ Standard Template Library
-
 #include <string>
-// Includes the string class from the C++ Standard Template Library
 
 class UserInterface {
-    // Defines the UserInterface class
 public:
     UserInterface();
     // Constructor for the UserInterface class
@@ -25,11 +18,9 @@ public:
 private:
     struct CountryInfo {
         std::string name;
-        // Name of the country
         std::string code;
         // Country code
         std::string currencySymbol;
-        // Currency symbol of the country
     };
 
     std::vector<CountryInfo> countries;
