@@ -5,13 +5,9 @@
 // Includes the Job header file, which contains the Job struct definition
 
 #include <vector>
-// Includes the vector container from the C++ Standard Template Library
-
 #include <string>
-// Includes the string class from the C++ Standard Template Library
 
 class FavoritesManager {
-    // Defines the FavoritesManager class
 public:
     FavoritesManager();
     // Constructor for the FavoritesManager class
