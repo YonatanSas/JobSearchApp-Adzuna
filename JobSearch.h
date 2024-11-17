@@ -2,34 +2,23 @@
 // Prevents multiple inclusions of this header file
 
 #include <vector>
-// Includes the vector container from the C++ Standard Template Library
-
 #include <string>
-// Includes the string class from the C++ Standard Template Library
-
 #include <thread>
 // Includes the thread class for multi-threading support
-
 #include <mutex>
 // Includes the mutex class for thread synchronization
-
 #include <condition_variable>
 // Includes the condition_variable class for thread synchronization
-
 #include <atomic>
 // Includes the atomic class for thread-safe operations
-
 #include "Job.h"
-// Includes the Job header file, which likely contains the Job struct definition
-
+// Includes the Job header file - contains the Job struct definition
 #include "httplib.h"
 // Includes the httplib header file for HTTP client functionality
-
 #include "json.hpp"
 // Includes the JSON library for parsing JSON data
 
 class JobSearch {
-    // Defines the JobSearch class
 public:
     JobSearch();
     // Constructor for the JobSearch class
