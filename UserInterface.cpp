@@ -136,9 +136,9 @@ void UserInterface::render() {
                 if (ImGui::Selectable(countries[i].name.c_str(), isSelected)) {
                     countryIndex = i;
                 }
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus();
-                }
+                //if (isSelected) {
+                //    ImGui::SetItemDefaultFocus();
+                //}
             }
             // For each country, create a selectable item in the dropdown
             ImGui::EndCombo();
